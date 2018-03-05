@@ -1,0 +1,7 @@
+Problem1:
+to compile for pipes IPC example: make CFLAGS=-PIPES
+to compile for msg que IPC example: make CFLAGS=-MSG_Q
+to compile for shared memory IPC example: make CFLAGS=-SHARED_MEM
+to compile for SOCKETS IPC example: make CFLAGS=-Sockets
+
+note:before compiling with a different CFLAG from before, use make clean first
