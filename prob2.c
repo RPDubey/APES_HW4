@@ -1,5 +1,9 @@
 /*******************************************************************************
-   This code implements IPC mechanisms as required in Problem 1, HW4
+   @Filename:prob2.c
+   @Brief:This code implements IPC mechanisms as required in Problem 1, HW4
+   Goal here is to provide 4 separate user space examples of IPC bidirectionally between two processes using:1)Pipes2)Sockets3)Shared Memory4)Queues.Messagesshould be bidirectiona.The message should send a structure that support twotypes of messages 1)String Printing (should have a length associated with the string) 2)USR LED Control (on/off)
+   @Author:Ravi Dubey
+   @Date:3/2/2018
  ******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>

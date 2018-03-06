@@ -1,4 +1,4 @@
-Problem1:
+Problem2:
 to compile for pipes IPC example: make CFLAGS=-PIPES
 to compile for msg que IPC example: make CFLAGS=-MSG_Q
 to compile for shared memory IPC example: make CFLAGS=-SHARED_MEM
