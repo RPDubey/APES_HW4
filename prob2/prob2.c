@@ -21,6 +21,10 @@
 #include <arpa/inet.h>
 
 #define PRINT_ERR(err) {printf("%s Error: %s\n",err, strerror(errno)); return -1;}
+#define LED_ON (system("echo 1 > /sys/class/leds/beaglebone:green:usr0/brightness"))
+#define LED_OFF (system("echo 0 > /sys/class/leds/beaglebone:green:usr0/brightness"))
+#define LED_CONTROL(status) {if(status == 1) LED_ON; \
+                             if(status == 0) LED_OFF; }
 
 #define MY_MQ "/send_receive_mq"
 #define PORT 8080
@@ -31,15 +35,12 @@ typedef struct {
         char message[BUF_SIZE - sizeof(uint8_t)];
 } msg_struct;
 
-//#define PIPES
+#define PIPES
 //#define MSG_Q
 //#define SHARED_MEM
 //#define SOCKETS
 
 int main(){
-
-/*linux has Half duplex setting, thus file_descriptor[0] is always used for reading,file_descriptor[1] always used for writing*/
-
 
         msg_struct child_message[1];
         strcpy(child_message->message,"Hello from Child");
@@ -53,10 +54,15 @@ int main(){
         if(message_buf==NULL) {printf("malloc Error: %s\n", strerror(errno)); return -1;}
         int ret;
 
+/*****Disabling the Heartbeat on LED 0 to control through application*******/
+        ret = system("echo none >/sys/class/leds/beaglebone:green:usr0/trigger");
+        if(ret == -1) PRINT_ERR("system");
+        printf("Heart Beat switched off on LED0");
 
 /************************************PIPE***********************************/
 #ifdef PIPES
         printf("PIPES Example\n");
+/*linux has Half duplex setting, thus file_descriptor[0] is always used for reading,file_descriptor[1] always used for writing*/
         int file_descriptor[2];
         ret = pipe(file_descriptor);
         if (ret==-1) {printf("Error: %s\n", strerror(errno)); return -1;}
@@ -67,17 +73,17 @@ int main(){
                 break;
         case 0://child process(has 0 as return for fork) executes this
                 printf("Child Process, PID:%d\n",getpid());
-                //close(file_descriptor[0]);
                 ret =write(file_descriptor[1],
                            child_message,
                            sizeof(child_message));
                 if(ret == -1) {printf("Message Not sent\n"); return -1;}
                 else printf("Message Sent from child\n");
-                sleep(1);
+                //sleep(3);
                 ret = read(file_descriptor[0],message_buf,BUF_SIZE);
                 if(ret == -1) {printf("Message Not rxd\n"); return -1;}
                 else printf("Messag rxd in child:%s;led_status:%d\n",
                             message_buf->message,message_buf->led_status);
+                LED_CONTROL(message_buf->led_status);
                 close(file_descriptor[0]); close(file_descriptor[1]);
                 printf("Exit child\n");
                 break;
@@ -89,7 +95,8 @@ int main(){
                 if(ret == -1) {printf("Message Not rxd\n"); return -1;}
                 else printf("Messag rxd in parent:%s;led_status:%d\n",
                             message_buf->message,message_buf->led_status);
-
+                LED_CONTROL(message_buf->led_status);
+                sleep(1);
                 ret = write(file_descriptor[1],parent_message,sizeof(parent_message));
                 if(ret == -1) {printf("Message Not sent\n"); return -1;}
                 else printf("Message Sent from parent\n");
