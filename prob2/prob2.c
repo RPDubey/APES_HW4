@@ -57,7 +57,7 @@ int main(){
 /*****Disabling the Heartbeat on LED 0 to control through application*******/
         ret = system("echo none >/sys/class/leds/beaglebone:green:usr0/trigger");
         if(ret == -1) PRINT_ERR("system");
-        printf("Heart Beat switched off on LED0");
+        printf("Heart Beat switched off on LED0\n");
 
 /************************************PIPE***********************************/
 #ifdef PIPES
@@ -72,7 +72,7 @@ int main(){
                 printf("Error: %s\n", strerror(errno)); return -1;
                 break;
         case 0://child process(has 0 as return for fork) executes this
-                printf("Child Process, PID:%d\n",getpid());
+                printf("Enter Child Process, PID:%d\n",getpid());
                 ret =write(file_descriptor[1],
                            child_message,
                            sizeof(child_message));
@@ -89,14 +89,14 @@ int main(){
                 break;
 
         default://parent process(receives PID as return for fork) executes this
-                printf("Parent Process, PID:%d\n",getpid());
+                printf("Enter Parent Process, PID:%d\n",getpid());
 
                 ret = read(file_descriptor[0],message_buf,BUF_SIZE);
                 if(ret == -1) {printf("Message Not rxd\n"); return -1;}
                 else printf("Messag rxd in parent:%s;led_status:%d\n",
                             message_buf->message,message_buf->led_status);
                 LED_CONTROL(message_buf->led_status);
-                sleep(1);
+                sleep(1);//so that changed LED status is visible
                 ret = write(file_descriptor[1],parent_message,sizeof(parent_message));
                 if(ret == -1) {printf("Message Not sent\n"); return -1;}
                 else printf("Message Sent from parent\n");
@@ -144,7 +144,10 @@ int main(){
                                ((msg_struct*)message_buf)->message,
                                ((msg_struct*)message_buf)->led_status,
                                num_bytes,msg_prio);
+                        LED_CONTROL((msg_struct*)message_buf->led_status);
+                        sleep(1);//so that change in led status is visible
                 }
+
                 num_bytes = mq_send(msgq,
                                     (const char*)child_message,
                                     sizeof(child_message),
@@ -182,6 +185,8 @@ int main(){
                                ((msg_struct*)message_buf)->message,
                                ((msg_struct*)message_buf)->led_status,
                                num_bytes,msg_prio);
+                        LED_CONTROL((msg_struct*)message_buf->led_status);
+
                 }
 
 
@@ -221,7 +226,8 @@ int main(){
                 printf("Read in child:%s; led_status:%d\n",
                        ((msg_struct*)pshmem_obj)->message,
                        ((msg_struct*)pshmem_obj)->led_status );
-
+                LED_CONTROL( ((msg_struct*)pshmem_obj)->led_status);
+                sleep(1);//so that change in led status is visible
                 /**clear memory***/
                 bzero(pshmem_obj,sizeof(msg_struct));
                 if(memcpy(pshmem_obj,child_message,sizeof(child_message)) == NULL) {PRINT_ERR("memcpy");}
@@ -252,6 +258,7 @@ int main(){
                 printf("Read in Parent :%s; led_status:%d\n",
                        ((msg_struct*)pshmem_obj)->message,
                        ((msg_struct*)pshmem_obj)->led_status );
+                LED_CONTROL( ((msg_struct*)pshmem_obj)->led_status);
                 shm_unlink(name);
                 break;
         }
@@ -302,6 +309,7 @@ int main(){
                 printf("read in child:%s;led_status:%d\n",
                        ((msg_struct*)message_buf)->message,
                        ((msg_struct*)message_buf)->led_status);
+                LED_CONTROL((msg_struct*)message_buf->led_status);
 
                 break;
 
@@ -354,6 +362,7 @@ int main(){
                 printf("read in parent:%s;led_status:%d\n",
                        ((msg_struct*)message_buf)->message,
                        ((msg_struct*)message_buf)->led_status);
+                LED_CONTROL((msg_struct*)message_buf->led_status);
 
                 num_char = write(newsockfd,parent_message,sizeof(parent_message));
                 if(num_char<0) {printf("write Error:%s\n",strerror(errno)); return -1;}
