@@ -37,7 +37,7 @@ typedef struct {
 
 //#define PIPES
 //#define MSG_Q
-#define SHARED_MEM
+//#define SHARED_MEM
 //#define SOCKETS
 
 int main(){
