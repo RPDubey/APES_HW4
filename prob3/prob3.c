@@ -61,9 +61,10 @@ static int __init pTreeInfo_init(void)
 																							proc_desc->comm,proc_desc->pid, \
 																							proc_desc->state,task_nice(proc_desc), \
 																							getNumChild(proc_desc) );
-																if(proc_desc == &init_task) break;
-																else proc_desc=proc_desc->parent;
 
+proc_desc=proc_desc->parent;
+																if(proc_desc == &init_task) break;
+																 
 								} while(1);
 
 
