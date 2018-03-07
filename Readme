@@ -5,3 +5,15 @@ to compile for shared memory IPC example: make CFLAGS=-SHARED_MEM
 to compile for SOCKETS IPC example: make CFLAGS=-Sockets
 
 note:before compiling with a different CFLAG from before, use make clean first
+
+Problem 3
+1)make
+2)insmod prob3.ko
+3)dmesg to see output
+4)rmmod prob3.ko to remove module
+
+Problem4:
+1)make
+2)insmod prob4.ko
+3)dmesg to see output
+4)rmmod prob4.ko to remove module
