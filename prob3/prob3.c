@@ -36,7 +36,7 @@ static int __init pTreeInfo_init(void)
 {
 								printk(KERN_INFO "Starting pTreeInfo Module\n");
 /*kernel stores list of processes in  circular doubly linked list called task_list
- * each element of the Task list is process descriptor of typr struct task_struct*/
+* each element of the Task list is process descriptor of typr struct task_struct*/
 								struct task_struct* proc_desc;
 
 /*current macro points to current process descriptor structure
@@ -62,9 +62,9 @@ static int __init pTreeInfo_init(void)
 																							proc_desc->state,task_nice(proc_desc), \
 																							getNumChild(proc_desc) );
 
-proc_desc=proc_desc->parent;
+																proc_desc=proc_desc->parent;
 																if(proc_desc == &init_task) break;
-																 
+
 								} while(1);
 
 
