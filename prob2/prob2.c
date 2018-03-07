@@ -35,9 +35,9 @@ typedef struct {
         char message[BUF_SIZE - sizeof(uint8_t)];
 } msg_struct;
 
-#define PIPES
+//#define PIPES
 //#define MSG_Q
-//#define SHARED_MEM
+#define SHARED_MEM
 //#define SOCKETS
 
 int main(){
@@ -144,7 +144,7 @@ int main(){
                                ((msg_struct*)message_buf)->message,
                                ((msg_struct*)message_buf)->led_status,
                                num_bytes,msg_prio);
-                        LED_CONTROL((msg_struct*)message_buf->led_status);
+                        LED_CONTROL( ((msg_struct*)message_buf)->led_status);
                         sleep(1);//so that change in led status is visible
                 }
 
@@ -185,7 +185,7 @@ int main(){
                                ((msg_struct*)message_buf)->message,
                                ((msg_struct*)message_buf)->led_status,
                                num_bytes,msg_prio);
-                        LED_CONTROL((msg_struct*)message_buf->led_status);
+                        LED_CONTROL( ((msg_struct*)message_buf)->led_status);
 
                 }
 
@@ -309,8 +309,7 @@ int main(){
                 printf("read in child:%s;led_status:%d\n",
                        ((msg_struct*)message_buf)->message,
                        ((msg_struct*)message_buf)->led_status);
-                LED_CONTROL((msg_struct*)message_buf->led_status);
-
+                LED_CONTROL( ((msg_struct*)message_buf)->led_status);
                 break;
 
         default://parent - server
@@ -362,7 +361,7 @@ int main(){
                 printf("read in parent:%s;led_status:%d\n",
                        ((msg_struct*)message_buf)->message,
                        ((msg_struct*)message_buf)->led_status);
-                LED_CONTROL((msg_struct*)message_buf->led_status);
+                LED_CONTROL( ((msg_struct*)message_buf)->led_status);
 
                 num_char = write(newsockfd,parent_message,sizeof(parent_message));
                 if(num_char<0) {printf("write Error:%s\n",strerror(errno)); return -1;}
